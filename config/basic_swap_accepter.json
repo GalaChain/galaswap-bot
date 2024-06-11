@@ -1,0 +1,43 @@
+{
+  "active": true,
+  "tradeLimits": [
+    {
+      "givingTokenClass": {
+        "collection": "GUSDC",
+        "category": "Unit",
+        "type": "none",
+        "additionalKey": "none"
+      },
+      "receivingTokenClass": {
+        "collection": "GALA",
+        "category": "Unit",
+        "type": "none",
+        "additionalKey": "none"
+      },
+      "rate": 1.01,
+      "resetIntervalMs": 3600000,
+      "giveLimitPerReset": 1000,
+      "maxPriceMovementPercent": 0.03,
+      "maxPriceMovementWindowMs": 1800000
+    },
+    {
+      "givingTokenClass": {
+        "collection": "GALA",
+        "category": "Unit",
+        "type": "none",
+        "additionalKey": "none"
+      },
+      "receivingTokenClass": {
+        "collection": "GUSDC",
+        "category": "Unit",
+        "type": "none",
+        "additionalKey": "none"
+      },
+      "rate": 1.01,
+      "resetIntervalMs": 3600000,
+      "giveLimitPerReset": 50000,
+      "maxPriceMovementPercent": 0.03,
+      "maxPriceMovementWindowMs": 1800000
+    }
+  ]
+}

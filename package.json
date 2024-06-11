@@ -1,0 +1,47 @@
+{
+  "name": "swapbot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node --loader ts-node/esm src/bot_main.ts",
+    "build": "tsc",
+    "format": "prettier --write 'src/**/*.ts'",
+    "format:check": "prettier --check  'src/**/*.ts'",
+    "test": "cross-env TS_NODE_FILES=true mocha --spec 'test/**/*.spec.ts' --exit",
+    "test:coverage": "cross-env NODE_ENV=test TS_NODE_FILES=true c8 npm run test",
+    "test:debug": "cross-env TS_NODE_FILES=true node -r ts-node/register node_modules/.bin/mocha --spec 'test/**/*.spec.ts' --exit --timeout 120000",
+    "test:debug:nospec": "cross-env TS_NODE_FILES=true node -r  ts-node/register node_modules/.bin/mocha --exit --timeout 120000"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@aws-sdk/client-secrets-manager": "^3.535.0",
+    "bignumber.js": "^9.1.2",
+    "dotenv": "^16.4.5",
+    "elliptic": "^6.5.5",
+    "ethers": "^6.12.1",
+    "js-sha3": "^0.9.3",
+    "json-stringify-deterministic": "^1.0.12",
+    "locko": "^1.1.0",
+    "mongodb": "^6.5.0",
+    "node-fetch": "^3.3.2",
+    "p-retry": "^6.2.0",
+    "pino": "^8.19.0",
+    "ts-is-present": "^1.2.2",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/elliptic": "^6.4.18",
+    "@types/mocha": "^10.0.6",
+    "@types/node": "^20.11.30",
+    "c8": "^9.1.0",
+    "cross-env": "^7.0.3",
+    "mocha": "^10.3.0",
+    "prettier": "^3.2.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.2"
+  }
+}

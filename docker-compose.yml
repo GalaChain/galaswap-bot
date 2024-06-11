@@ -1,0 +1,25 @@
+services:
+  bot:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      - mongo
+    environment:
+      - MONGO_URI=mongodb://root:${MONGO_PASSWORD}@mongo:27017
+      - GALA_WALLET_ADDRESS=${GALA_WALLET_ADDRESS}
+      - GALA_PRIVATE_KEY=${GALA_PRIVATE_KEY}
+      - SLACK_WEBHOOK_URI=${SLACK_WEBHOOK_URI}
+      - SLACK_ALERT_WEBHOOK_URI=${SLACK_ALERT_WEBHOOK_URI}
+      - GALASWAP_API_BASE_URI=${GALASWAP_API_BASE_URI}
+      - EXECUTION_DELAY_MS=${EXECUTION_DELAY_MS}
+      - IGNORE_SWAPS_CREATED_BEFORE=${IGNORE_SWAPS_CREATED_BEFORE}
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
+    ports:
+      - '0.0.0.0:50002:27017'
+    volumes:
+      - ./mongodata:/data/db
