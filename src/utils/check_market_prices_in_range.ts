@@ -41,11 +41,11 @@ export function checkMarketPriceWithinRanges(
     }
 
     if (matchingValue.currentPrices.usd < token.min) {
-      throw new Error(`Token ${token} is below minimum specified price`);
+      throw new Error(`Token ${stringifyTokenClass(token)} is below minimum specified price`);
     }
 
     if (matchingValue.currentPrices.usd > token.max) {
-      throw new Error(`Token ${token} is above maximum specified price`);
+      throw new Error(`Token ${stringifyTokenClass(token)} is above maximum specified price`);
     }
   }
 }
