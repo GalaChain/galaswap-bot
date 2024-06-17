@@ -139,6 +139,9 @@ export async function mainLoopTick(
         options,
       );
 
+      const hasActionToTake =
+        swapsToAccept.length > 0 || swapsToCreate.length > 0 || swapsToTerminate.length > 0;
+
       for (const swapToTerminate of swapsToTerminate) {
         await reporter.reportTerminatingSwap(tokenValues, swapToTerminate);
         await galaSwapApi.terminateSwap(swapToTerminate.swapRequestId);
@@ -160,6 +163,10 @@ export async function mainLoopTick(
         await sleep(executionDelay);
         const createdSwap = await galaSwapApi.createSwap(swapToCreate);
         await createdSwapStore.addSwap(createdSwap);
+      }
+
+      if (hasActionToTake) {
+        break;
       }
     }
   } catch (err) {
