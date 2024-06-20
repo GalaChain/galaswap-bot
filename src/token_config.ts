@@ -33,10 +33,7 @@ const tokenConfigSchema = z
 export type ITokenConfig = z.infer<typeof tokenConfigSchema>;
 
 const unparsedDefaultTokenConfig = JSON.parse(
-  fs.readFileSync(
-    path.join(import.meta.dirname, '..', '..', 'config', 'token_config.json'),
-    'utf-8',
-  ),
+  fs.readFileSync(path.join(import.meta.dirname, '..', 'config', 'token_config.json'), 'utf-8'),
 );
 
 export const defaultTokenConfig = tokenConfigSchema.parse(unparsedDefaultTokenConfig);
