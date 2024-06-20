@@ -123,7 +123,7 @@ export async function tickTestRunner(strategy: ISwapStrategy, stages: TickTestSt
           0,
           {
             now,
-            marketPriceConfig: [],
+            tokenConfig: { priceLimits: [], projectTokens: [] },
           },
         );
         break;

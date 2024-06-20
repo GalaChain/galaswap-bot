@@ -101,8 +101,9 @@ export class GalaSwapApi implements IGalaSwapApi {
     return response.json() as unknown;
   }
 
-  async getTokens() {
-    const tokenResponse = await this.retry(() => this.fetchJson('/v1/tokens', 'GET', false));
+  async getTokens(searchPrefix?: string) {
+    const path = searchPrefix ? `/v1/tokens?searchprefix=${searchPrefix}` : '/v1/tokens';
+    const tokenResponse = await this.retry(() => this.fetchJson(path, 'GET', false));
     return tokenResponseSchema.parse(tokenResponse);
   }
 

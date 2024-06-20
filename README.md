@@ -41,6 +41,7 @@ Next, if you're going to use the included strategies, you should configure them 
    - `resetIntervalMs`: The time period in milliseconds that the bot will wait before resetting the `giveLimitPerReset` counter. For example if this is set to `3600000` and `giveLimitPerReset` is set to `1000`, then this strategy won't spend more than `1000` of the `givingTokenClass` for accepting swaps over a one hour period.
    - `maxPriceMovementPercent`: The maximum difference between the min and max price of either of the tokens in the pair during the number of milliseconds specified in the below option (`maxPriceMovementWindowMs`). If prices move more than this much during the specified period of time, the bot will stop accepting swaps for this pair until prices become less volatile. For example a value of `0.03` allows up to 3% price movement.
    - `maxPriceMovementWindowMs`: The length of time in milliseconds that the bot will look back to calculate volatility as explained above.
+   - `maxReceivingTokenPriceUSD` (optional): If the price of the receiving token goes above this number of USD, the bot will stop accepting swaps for this pair.
 2. `basic_swap_creator.json`: This defines swaps that the bot should create. There are three subsections in this configuration:
    - `targetActiveSwaps`: This is a list of pairs that the bot will try to keep active swaps for. For each pair you can configure:
      - `targetProfitability`: The rate that the bot will offer, compared to the market rate. For example, `1.05` means the bot will offer swaps that are 5% better (for itself) than the current market rate.
@@ -51,9 +52,12 @@ Next, if you're going to use the included strategies, you should configure them 
      - `resetIntervalMs`: The time period in milliseconds that the bot will wait before resetting the `giveLimitPerReset` counter.
      - `maxPriceMovementPercent`: The maximum difference between the min and max price of either of the tokens in the pair during the number of milliseconds specified in the below option (`maxPriceMovementWindowMs`). If prices move more than this much during the specified period of time, the bot will stop creating swaps for this pair until prices become less volatile. For example a value of `0.03` allows up to 3% price movement.
      - `maxPriceMovementWindowMs`: The length of time in milliseconds that the bot will look back to calculate volatility as explained above.
+     - `maxReceivingTokenPriceUSD` (optional): If the price of the receiving token goes above this number of USD, the bot will stop creating swaps for this pair.
    - `receivingTokenRoundingConfigs`: When the bot calculates how many tokens it wants to receive in a swap, it will round the number of tokens up to the number of `decimalPlaces` that you configure here.
    - `creationLimits`: The bot will stop creating new swaps when it gives a specified amount of the `givingTokenClass` within a specified time period. That's configurable here.
-3. `market_price_config.json`: You can specify minimum and maximum prices for tokens (in USD) in here. If the price of any token goes out of the specified range, the bot will completely stop operating until you restart it. This can be useful as a failsafe in case of extreme market conditions. Note that any of your open swaps will remain open. If you don't want to use this, you may specify an empty array `[]` in this file.
+3. `token_config.json`: This config file contains two sections:
+   - `priceLimits`: If the price of a token goes out of the range specified here, the bot will completely stop operating until you restart it. This can be useful as a failsafe in case of extreme market conditions. Note that any of your open swaps will remain open. If you don't want to use this, you may specify an empty array `[]` in this file.
+   - `projectTokens`: By default, the bot will only fetch price information for "trending" tokens (including $GALA and most other tokens that have prices available on CoinGecko). To fetch prices for other tokens, include their symbols here. Don't include more than a handful of project tokens or you may get rate-limited.
 
 The default configuration has some sane defaults for trading GALA and GUSDC in both directions.
 

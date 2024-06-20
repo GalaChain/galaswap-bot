@@ -112,7 +112,7 @@ export const swapsByUserResponseSchema = z
 export const acceptSwapResponseSchema = z.object({}).readonly();
 
 export interface IGalaSwapApi {
-  getTokens(): Promise<{
+  getTokens(searchPrefix?: string): Promise<{
     tokens: readonly Readonly<IGalaSwapToken>[];
   }>;
   getRawBalances(userId: string): Promise<readonly Readonly<ITokenBalance>[]>;

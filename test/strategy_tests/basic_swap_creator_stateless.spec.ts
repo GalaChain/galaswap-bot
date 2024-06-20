@@ -228,16 +228,19 @@ describe('Basic swap creator tests', () => {
       [],
       0,
       {
-        marketPriceConfig: [
-          {
-            collection: 'GALA',
-            category: 'Unit',
-            type: 'none',
-            additionalKey: 'none',
-            min: 0.02,
-            max: 0.03,
-          },
-        ],
+        tokenConfig: {
+          priceLimits: [
+            {
+              collection: 'GALA',
+              category: 'Unit',
+              type: 'none',
+              additionalKey: 'none',
+              min: 0.02,
+              max: 0.03,
+            },
+          ],
+          projectTokens: [],
+        },
       },
     ).catch((err) => err);
 

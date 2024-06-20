@@ -1,3 +1,4 @@
+import assert from 'assert';
 import BigNumber from 'bignumber.js';
 import { IGalaSwapToken, IRawSwap, ITokenBalance } from '../../dependencies/galaswap/types.js';
 import { IStatusReporter } from '../../dependencies/status_reporters.js';
@@ -108,6 +109,7 @@ export async function getSwapsToAccept(
     rate,
     giveLimitPerReset,
     amountGivenThisInterval,
+    maxReceivingTokenPriceUSD,
   } of pairLimitsWithCurrentState) {
     if (givingTokenPriceChangePercent > maxPriceMovementPercent) {
       continue;
@@ -124,6 +126,17 @@ export async function getSwapsToAccept(
     );
 
     if (!currentMarketRate) {
+      continue;
+    }
+
+    const receivingTokenValue = tokenValues.find((t) => areSameTokenClass(t, receivingTokenClass));
+    assert(receivingTokenValue, `Token value not found for ${receivingTokenClass}`);
+
+    if (
+      typeof maxReceivingTokenPriceUSD === 'number' &&
+      (!receivingTokenValue.currentPrices.usd ||
+        receivingTokenValue.currentPrices.usd > maxReceivingTokenPriceUSD)
+    ) {
       continue;
     }
 

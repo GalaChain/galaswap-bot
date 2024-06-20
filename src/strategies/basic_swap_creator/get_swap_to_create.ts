@@ -51,6 +51,19 @@ export async function getSwapsToCreate(
         BigNumber(swap.offered[0].quantity).multipliedBy(swap.uses).eq(target.targetGivingSize),
       );
 
+    const receivingTokenValue = tokenValues.find((t) =>
+      areSameTokenClass(t, target.receivingTokenClass),
+    );
+    assert(receivingTokenValue, `Token value not found for ${target.receivingTokenClass}`);
+
+    if (
+      typeof target.maxReceivingTokenPriceUSD === 'number' &&
+      (!receivingTokenValue.currentPrices.usd ||
+        receivingTokenValue.currentPrices.usd > target.maxReceivingTokenPriceUSD)
+    ) {
+      continue;
+    }
+
     if (activeSwapsForThisTarget.length > 0) {
       continue;
     }
