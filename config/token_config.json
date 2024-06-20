@@ -1,0 +1,17 @@
+{
+  "priceLimits": [
+    {
+      "collection": "GALA",
+      "category": "Unit",
+      "type": "none",
+      "additionalKey": "none",
+      "min": 0,
+      "max": 100
+    }
+  ],
+  "projectTokens": [
+    {
+      "symbol": "WEN"
+    }
+  ]
+}

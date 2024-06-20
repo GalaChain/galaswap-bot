@@ -1,38 +1,10 @@
-import fs from 'fs';
-import path from 'path';
-import { z } from 'zod';
 import { IGalaSwapToken } from '../dependencies/galaswap/types.js';
+import { defaultTokenConfig } from '../token_config.js';
 import { areSameTokenClass, stringifyTokenClass } from '../types/type_helpers.js';
-
-const marketPriceConfigSchema = z
-  .array(
-    z
-      .object({
-        collection: z.string(),
-        category: z.string(),
-        type: z.string(),
-        additionalKey: z.string(),
-        min: z.number(),
-        max: z.number(),
-      })
-      .readonly(),
-  )
-  .readonly();
-
-export type IMarketPriceConfig = z.infer<typeof marketPriceConfigSchema>;
-
-const marketPriceDefaultConfig = JSON.parse(
-  fs.readFileSync(
-    path.join(import.meta.dirname, '..', '..', 'config', 'market_price_config.json'),
-    'utf-8',
-  ),
-);
-
-const parsedMarketPriceDefaultConfig = marketPriceConfigSchema.parse(marketPriceDefaultConfig);
 
 export function checkMarketPriceWithinRanges(
   tokenValues: readonly IGalaSwapToken[],
-  config = parsedMarketPriceDefaultConfig,
+  config = defaultTokenConfig.priceLimits,
 ) {
   for (const token of config) {
     const matchingValue = tokenValues.find((tv) => areSameTokenClass(tv, token));

@@ -6,12 +6,10 @@ import { IGalaSwapApi } from './dependencies/galaswap/types.js';
 import { MongoPriceStore } from './dependencies/price_store.js';
 import { IStatusReporter } from './dependencies/status_reporters.js';
 import { ISwapStrategy, ISwapToAccept } from './strategies/swap_strategy.js';
+import { ITokenConfig, defaultTokenConfig } from './token_config.js';
 import { stringifyTokenClass } from './types/type_helpers.js';
 import { ILogger } from './types/types.js';
-import {
-  IMarketPriceConfig,
-  checkMarketPriceWithinRanges,
-} from './utils/check_market_prices_in_range.js';
+import { checkMarketPriceWithinRanges } from './utils/check_market_prices_in_range.js';
 
 const sleep = util.promisify(setTimeout);
 
@@ -52,7 +50,7 @@ export async function mainLoopTick(
   options: {
     ignoreSwapsCreatedBefore?: Date;
     now?: Date;
-    marketPriceConfig?: IMarketPriceConfig;
+    tokenConfig?: ITokenConfig;
   } = {},
 ) {
   try {
@@ -68,12 +66,23 @@ export async function mainLoopTick(
     );
 
     const ownBalances = await galaSwapApi.getRawBalances(ownWalletAddress);
-    const tokenValues = (await galaSwapApi.getTokens()).tokens;
+    const trendingTokenValues = (await galaSwapApi.getTokens()).tokens;
 
-    checkMarketPriceWithinRanges(tokenValues, options.marketPriceConfig);
+    const projectTokensConfig =
+      options.tokenConfig?.projectTokens || defaultTokenConfig.projectTokens;
+    const projectTokenValues = (
+      await Promise.all(
+        projectTokensConfig.map(async (token) => {
+          return (await galaSwapApi.getTokens(token.symbol)).tokens;
+        }),
+      )
+    ).flat();
+
+    const allTokenValues = trendingTokenValues.concat(projectTokenValues);
+    checkMarketPriceWithinRanges(allTokenValues, options.tokenConfig?.priceLimits);
 
     await priceStore.addPrices(
-      tokenValues
+      allTokenValues
         .filter((t) => typeof t.currentPrices.usd === 'number')
         .map((tokenValue) => ({
           tokenClass: {
@@ -118,7 +127,7 @@ export async function mainLoopTick(
             amountReceivedThisUse,
           );
 
-          await reporter.sendCreatedSwapAcceptedMessage(tokenValues, swapStateBefore, swap);
+          await reporter.sendCreatedSwapAcceptedMessage(allTokenValues, swapStateBefore, swap);
         }
       }),
     );
@@ -135,7 +144,7 @@ export async function mainLoopTick(
         priceStore,
         ownBalances,
         ownSwaps,
-        tokenValues,
+        allTokenValues,
         options,
       );
 
@@ -143,12 +152,12 @@ export async function mainLoopTick(
         swapsToAccept.length > 0 || swapsToCreate.length > 0 || swapsToTerminate.length > 0;
 
       for (const swapToTerminate of swapsToTerminate) {
-        await reporter.reportTerminatingSwap(tokenValues, swapToTerminate);
+        await reporter.reportTerminatingSwap(allTokenValues, swapToTerminate);
         await galaSwapApi.terminateSwap(swapToTerminate.swapRequestId);
       }
 
       for (const swapToAccept of swapsToAccept) {
-        await reporter.reportAcceptingSwap(tokenValues, swapToAccept);
+        await reporter.reportAcceptingSwap(allTokenValues, swapToAccept);
         await sleep(executionDelay);
         const acceptResult = await galaSwapApi.acceptSwap(
           swapToAccept.swapRequestId,
@@ -159,7 +168,7 @@ export async function mainLoopTick(
       }
 
       for (const swapToCreate of swapsToCreate) {
-        await reporter.reportCreatingSwap(tokenValues, swapToCreate);
+        await reporter.reportCreatingSwap(allTokenValues, swapToCreate);
         await sleep(executionDelay);
         const createdSwap = await galaSwapApi.createSwap(swapToCreate);
         await createdSwapStore.addSwap(createdSwap);
