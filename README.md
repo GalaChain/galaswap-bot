@@ -57,7 +57,7 @@ Next, if you're going to use the included strategies, you should configure them 
    - `creationLimits`: The bot will stop creating new swaps when it gives a specified amount of the `givingTokenClass` within a specified time period. That's configurable here.
 3. `token_config.json`: This config file contains two sections:
    - `priceLimits`: If the price of a token goes out of the range specified here, the bot will completely stop operating until you restart it. This can be useful as a failsafe in case of extreme market conditions. Note that any of your open swaps will remain open. If you don't want to use this, you may specify an empty array `[]` in this file.
-   - `projectTokens`: By default, the bot will only fetch price information for "trending" tokens (including $GALA and most other tokens that have prices available on CoinGecko). To fetch prices for other tokens, include their symbols here.
+   - `projectTokens`: By default, the bot will only fetch price information for "trending" tokens (including $GALA and most other tokens that have prices available on CoinGecko). To fetch prices for other tokens, include their symbols here. Don't include more than a handful of project tokens or you may get rate-limited.
 
 The default configuration has some sane defaults for trading GALA and GUSDC in both directions.
 
