@@ -139,6 +139,267 @@ export class ConsoleStatusReporter implements IStatusReporter {
   }
 }
 
+export class DiscordStatusReporter implements IStatusReporter {
+  constructor(
+    private readonly swapAcceptanceWebhookUri: string,
+    private readonly alertWebhookUri: string,
+  ) {}
+
+  async reportAcceptingSwap(
+    galaSwapTokens: readonly Readonly<IGalaSwapToken>[],
+    swapToAccept: Readonly<ISwapToAccept>,
+  ) {
+    const swapDetails = getSwapDetails(galaSwapTokens, swapToAccept);
+    const giving = swapToAccept.wanted[0];
+    const receiving = swapToAccept.offered[0];
+
+    const givingSymbol = swapDetails.wantedSymbol;
+    const receivingSymbol = swapDetails.offeringSymbol;
+
+    const totalGivingAmount = BigNumber(giving.quantity).multipliedBy(swapToAccept.usesToAccept);
+
+    const totalReceivingAmount = BigNumber(receiving.quantity).multipliedBy(
+      swapToAccept.usesToAccept,
+    );
+
+    const actualSwapRate = getActualSwapRate(
+      totalGivingAmount.toNumber(),
+      totalReceivingAmount.toNumber(),
+    );
+
+    const marketRate = getCurrentMarketRate(
+      giving.tokenInstance,
+      receiving.tokenInstance,
+      galaSwapTokens,
+    );
+
+    assert(marketRate, 'Market rate not found');
+
+    const goodnessRate = getSwapGoodnessRate(actualSwapRate, marketRate);
+
+    await this.fetch(this.swapAcceptanceWebhookUri, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        embeds: [
+          {
+            title: 'I am Accepting a Swap',
+            thumbnail: {
+              url: 'https://galaswap.gala.com/img/hero-image.png',
+            },
+            color: 0x00ff00,
+            fields: [
+              {
+                name: 'Swap ID',
+                value: swapDetails.cleanId,
+              },
+              {
+                name: 'I am giving',
+                value: `${totalGivingAmount} ${givingSymbol}`,
+              },
+              {
+                name: 'I am receiving',
+                value: `${totalReceivingAmount} ${receivingSymbol}`,
+              },
+              {
+                name: 'Actual Swap Rate',
+                value: `${actualSwapRate.toFixed(4)} ${receivingSymbol} per ${givingSymbol}`,
+              },
+              {
+                name: 'Fair Market Rate',
+                value: `${marketRate.toFixed(4)} ${receivingSymbol} per ${givingSymbol}`,
+              },
+              {
+                name: 'Swap Rate Compared to Fair Market',
+                value: getRateDescription(goodnessRate),
+              },
+            ],
+          },
+        ],
+      }),
+    });
+  }
+
+  async reportTerminatingSwap(
+    galaSwapTokens: readonly Readonly<IGalaSwapToken>[],
+    swap: Readonly<ISwapToTerminate>,
+  ) {
+    const swapDetails = getSwapDetails(galaSwapTokens, swap);
+    const givingQuantity = swapDetails.totalOfferingQuantity;
+    const receivingQuantity = swapDetails.totalWantedQuantity;
+
+    await this.fetch(this.swapAcceptanceWebhookUri, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        embeds: [
+          {
+            title: 'I am Terminating a Swap',
+            color: 0xff0000,
+            thumbnail: {
+              url: 'https://galaswap.gala.com/img/hero-image.png',
+            },
+            fields: [
+              {
+                name: 'Swap ID',
+                value: swap.swapRequestId.replaceAll('\u0000', '\\u0000'),
+              },
+              {
+                name: 'Termination reason',
+                value: swap.terminationReason ?? 'None provided',
+              },
+              {
+                name: 'I was offering (total)',
+                value: `${givingQuantity} ${swapDetails.offeringSymbol}`,
+              },
+              {
+                name: 'I was asking for (total)',
+                value: `${receivingQuantity} ${swapDetails.wantedSymbol}`,
+              },
+              {
+                name: 'Remaining amount I was offering',
+                value: `${swapDetails.offeringQuantityRemaining} ${swapDetails.offeringSymbol}`,
+              },
+              {
+                name: 'Remaining amount I was asking for',
+                value: `${swapDetails.wantedQuantityRemaining} ${swapDetails.wantedSymbol}`,
+              },
+            ],
+          },
+        ],
+      }),
+    });
+  }
+
+  async sendCreatedSwapAcceptedMessage(
+    galaSwapTokens: readonly Readonly<IGalaSwapToken>[],
+    swapStateBefore: Readonly<IRawSwap>,
+    swapStateAfter: Readonly<IRawSwap>,
+  ) {
+    const swapDetailsBefore = getSwapDetails(galaSwapTokens, swapStateBefore);
+    const swapDetailsAfter = getSwapDetails(galaSwapTokens, swapStateAfter);
+    const diff = diffSwaps(galaSwapTokens, swapStateBefore, swapStateAfter);
+
+    await this.fetch(this.swapAcceptanceWebhookUri, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        embeds: [
+          {
+            title: 'My Swap Has Been Accepted',
+            color: 0x00ff00,
+            thumbnail: {
+              url: 'https://galaswap.gala.com/img/hero-image.png',
+            },
+            fields: [
+              {
+                name: 'Swap ID',
+                value: swapDetailsBefore.cleanId,
+              },
+              {
+                name: 'I gave',
+                value: `${diff.remainingOfferedQuantityDifference} ${swapDetailsBefore.offeringSymbol}`,
+              },
+              {
+                name: 'I received',
+                value: `${diff.remainingWantedQuantityDifference} ${swapDetailsBefore.wantedSymbol}`,
+              },
+              {
+                name: 'Remaining to give',
+                value: `${swapDetailsAfter.offeringQuantityRemaining} ${swapDetailsAfter.offeringSymbol}`,
+              },
+              {
+                name: 'Remaining to receive',
+                value: `${swapDetailsAfter.wantedQuantityRemaining} ${swapDetailsBefore.wantedSymbol}`,
+              },
+            ],
+          },
+        ],
+      }),
+    });
+  }
+
+  async reportCreatingSwap(
+    galaSwapTokens: readonly Readonly<IGalaSwapToken>[],
+    swap: Readonly<Pick<IRawSwap, 'offered' | 'wanted' | 'uses'>>,
+  ) {
+    const swapDetails = getSwapDetails(galaSwapTokens, { ...swap, usesSpent: '0' });
+    const givingSymbol = swapDetails.offeringSymbol;
+    const receivingSymbol = swapDetails.wantedSymbol;
+    const givingQuantity = swapDetails.totalOfferingQuantity;
+    const receivingQuantity = swapDetails.totalWantedQuantity;
+
+    await this.fetch(this.swapAcceptanceWebhookUri, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        embeds: [
+          {
+            title: 'I Am Creating a Swap',
+            color: 0x0000ff,
+            thumbnail: {
+              url: 'https://galaswap.gala.com/img/hero-image.png',
+            },
+            fields: [
+              {
+                name: 'I am offering',
+                value: `${givingQuantity} ${givingSymbol}`,
+              },
+              {
+                name: 'I am asking for',
+                value: `${receivingQuantity} ${receivingSymbol}`,
+              },
+              {
+                name: 'Total Uses',
+                value: swap.uses,
+              },
+            ],
+          },
+        ],
+      }),
+    });
+  }
+
+  async sendAlert(message: string) {
+    await this.fetch(this.alertWebhookUri, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        content: `ALERT: ${message}`,
+      }),
+    });
+  }
+
+  private fetch(param1: Parameters<typeof fetch>[0], param2: Parameters<typeof fetch>[1]) {
+    return locko.doWithLock('discord_webhook_sender', async () => {
+      await pRetry(async () => {
+        const response = await fetch(param1, param2);
+        if (!response.ok) {
+          throw new Error(
+            `Failed to fetch: ${response.status} ${response.statusText} ${await response.text()}`,
+          );
+        }
+
+        return response;
+      });
+
+      // Since we do this in an exclusive lock, this restricts us from sending more than 1 webhook per second
+      // so that we do not get impacted by rate limiting.
+      await sleep(1_000);
+    });
+  }
+}
+
 export class SlackWebhookStatusReporter implements IStatusReporter {
   constructor(
     private readonly swapAcceptanceWebhookUri: string,

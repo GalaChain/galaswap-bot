@@ -13,7 +13,7 @@ You must have [Node.js](https://nodejs.org/en/download) installed. Check the [.n
 
 You must also have [Docker](https://www.docker.com/get-started/) installed if you wish to run the bot in Docker (which is the easiest way to get started).
 
-It's also recommended to have a Slack workspace and create a [Slack application](https://api.slack.com/apps) and two `Incoming Webhooks` inside of it. The bot will use one for sending trade notifications and the other for sending error notifications. If you omit these, the bot will output these notifications to the console instead.
+It's also recommended to have a Discord server and create two `Webhooks` inside of it. The bot will use one for sending trade notifications and the other for sending error notifications. If you omit these, the bot will output these notifications to the console instead. You can also use Slack webhooks if you prefer.
 
 ## Configuration
 
@@ -28,9 +28,11 @@ MONGO_PASSWORD=a password for the database instance (this can be any password yo
 You may also specify additional optional variables:
 
 ```
-SLACK_WEBHOOK_URI=Your Slack Incoming Webhook URI for trade notifications
-SLACK_ALERT_WEBHOOK_URI=Your Slack Incoming Webhook URI for error notifications
+DISCORD_WEBHOOK_URI=Your Discord Incoming Webhook URI for trade notifications
+DISCORD_ALERT_WEBHOOK_URI=Your Discord Incoming Webhook URI for error notifications
 EXECUTION_DELAY_MS=A number of milliseconds to delay before accepting or creating a swap (may be useful for testing) (default: 0)
+SLACK_WEBHOOK_URI=Your Slack Incoming Webhook URI for trade notifications (if you would rather use Slack than Discord)
+SLACK_ALERT_WEBHOOK_URI=Your Slack Incoming Webhook URI for error notifications (if you would rather use Slack than Discord)
 ```
 
 Next, if you're going to use the included strategies, you should configure them to your liking in the [./config](./config) directory. There are three files there:

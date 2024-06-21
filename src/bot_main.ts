@@ -9,6 +9,8 @@ import { GalaSwapApi } from './dependencies/galaswap/galaswap_api.js';
 import { MongoPriceStore } from './dependencies/price_store.js';
 import {
   ConsoleStatusReporter,
+  DiscordStatusReporter,
+  IStatusReporter,
   SlackWebhookStatusReporter,
 } from './dependencies/status_reporters.js';
 import { BasicSwapAccepterStrategy } from './strategies/basic_swap_accepter/basic_swap_accepter_strategy.js';
@@ -33,6 +35,9 @@ async function main(logger: ILogger) {
   const slackInfoWebhookUri = await configuration.getOptional('SLACK_WEBHOOK_URI');
   const slackAlertWebhookUri =
     (await configuration.getOptional('SLACK_ALERT_WEBHOOK_URI')) ?? slackInfoWebhookUri;
+  const discordInfoWebhookUri = await configuration.getOptional('DISCORD_WEBHOOK_URI');
+  const discordAlertWebhookUri =
+    (await configuration.getOptional('DISCORD_ALERT_WEBHOOK_URI')) ?? discordInfoWebhookUri;
 
   const galaSwapApiBaseUri = await configuration.getOptionalWithDefault(
     'GALASWAP_API_BASE_URI',
@@ -87,15 +92,19 @@ async function main(logger: ILogger) {
     logger,
   );
 
-  const reporter = slackInfoWebhookUri
-    ? new SlackWebhookStatusReporter(slackInfoWebhookUri, slackAlertWebhookUri!)
-    : new ConsoleStatusReporter();
+  let reporter: IStatusReporter = new ConsoleStatusReporter();
+
+  if (slackInfoWebhookUri) {
+    reporter = new SlackWebhookStatusReporter(slackInfoWebhookUri, slackAlertWebhookUri!);
+  } else if (discordInfoWebhookUri) {
+    reporter = new DiscordStatusReporter(discordInfoWebhookUri, discordAlertWebhookUri!);
+  }
 
   /* End of dependencies */
 
   // Liftoff...
 
-  console.log('Starting...');
+  console.log('Started');
 
   try {
     await mainLoop(
