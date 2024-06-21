@@ -7,13 +7,17 @@ It comes with two built-in trading strategies:
 1. Basic Swap Accepter: Identifies and accepts swaps that are being offered at a rate better than the current going market rate (based on prices from GalaSwap, which typically come from CoinGecko).
 2. Basic Swap Creator: Offers liquidity by creating swaps at a specified rate. Cancels and recreates swaps when the market rates change sufficiently.
 
+## Getting the Code
+
+`git clone https://github.com/GalaChain/galaswap-bot.git`
+
 ## Installation
 
-You must have [Node.js](https://nodejs.org/en/download) installed. Check the [.nvmrc](./.nvmrc) file for the recommended version. At the time of this writing, you should use the latest Node v20.x.x release.
-
-You must also have [Docker](https://www.docker.com/get-started/) installed if you wish to run the bot in Docker (which is the easiest way to get started).
+You must have [Docker](https://www.docker.com/get-started/) installed if you wish to run the bot in Docker (which is the easiest way to get started).
 
 It's also recommended to have a Discord server and create two `Webhooks` inside of it. The bot will use one for sending trade notifications and the other for sending error notifications. If you omit these, the bot will output these notifications to the console instead. You can also use Slack webhooks if you prefer.
+
+If you are going to develop and modify the bot, you should have [Node.js](https://nodejs.org/en/download) installed. Check the [.nvmrc](./.nvmrc) file for the recommended version. At the time of this writing, you should use the latest Node v20.x.x release. Run `npm install` in this directory to install the needed Node.js dependencies.
 
 ## Configuration
 
