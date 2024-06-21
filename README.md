@@ -9,9 +9,9 @@ It comes with two built-in trading strategies:
 
 ## Installation
 
-You must have Node.js installed. Check the [.nvmrc](./.nvmrc) file for the recommended version. At the time of this writing, you should use the latest Node v20.x.x release.
+You must have [Node.js](https://nodejs.org/en/download) installed. Check the [.nvmrc](./.nvmrc) file for the recommended version. At the time of this writing, you should use the latest Node v20.x.x release.
 
-You must also have [Docker](https://www.docker.com/) installed if you wish to run the bot in Docker (which is the easiest way to get started).
+You must also have [Docker](https://www.docker.com/get-started/) installed if you wish to run the bot in Docker (which is the easiest way to get started).
 
 It's also recommended to have a Slack workspace and create a [Slack application](https://api.slack.com/apps) and two `Incoming Webhooks` inside of it. The bot will use one for sending trade notifications and the other for sending error notifications. If you omit these, the bot will output these notifications to the console instead.
 
