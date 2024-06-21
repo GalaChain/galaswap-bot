@@ -24,9 +24,9 @@ If you are going to develop and modify the bot, you should have [Node.js](https:
 First create a `.env` file in the root directory of this project. This is where secret values will be stored. Enter the following, adding in your own values after the `=` signs:
 
 ```
+MONGO_PASSWORD=a password for the database instance (this can be any password you want, if you're using Docker)
 GALA_WALLET_ADDRESS=your GalaChain wallet address (see the "Getting your Private Key" section at https://galaswap.gala.com/info/api.html)
 GALA_PRIVATE_KEY=the GalaChain private key of your Gala account (see the "Getting your Private Key" section at https://galaswap.gala.com/info/api.html)
-MONGO_PASSWORD=a password for the database instance (this can be any password you want, if you're using Docker)
 ```
 
 You may also specify additional optional variables:
