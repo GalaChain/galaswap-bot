@@ -17,7 +17,7 @@
       "targetProfitability": 1.05,
       "minProfitability": 1.01,
       "maxProfitability": 1.15,
-      "targetGivingSize": 10000,
+      "targetGivingSize": 10,
       "maxPriceMovementPercent": 0.03,
       "maxPriceMovementWindowMs": 1800000
     },
@@ -37,7 +37,7 @@
       "targetProfitability": 1.05,
       "minProfitability": 1.01,
       "maxProfitability": 1.15,
-      "targetGivingSize": 50000,
+      "targetGivingSize": 100,
       "maxPriceMovementPercent": 0.03,
       "maxPriceMovementWindowMs": 1800000
     }
@@ -73,7 +73,7 @@
         "additionalKey": "none"
       },
       "resetIntervalMs": 43200000,
-      "giveLimitPerReset": 30000
+      "giveLimitPerReset": 20
     },
     {
       "givingTokenClass": {
@@ -89,7 +89,7 @@
         "additionalKey": "none"
       },
       "resetIntervalMs": 43200000,
-      "giveLimitPerReset": 150000
+      "giveLimitPerReset": 200
     }
   ]
 }

@@ -16,7 +16,7 @@
       },
       "rate": 1.01,
       "resetIntervalMs": 3600000,
-      "giveLimitPerReset": 1000,
+      "giveLimitPerReset": 10,
       "maxPriceMovementPercent": 0.03,
       "maxPriceMovementWindowMs": 1800000
     },
@@ -35,7 +35,7 @@
       },
       "rate": 1.01,
       "resetIntervalMs": 3600000,
-      "giveLimitPerReset": 50000,
+      "giveLimitPerReset": 100,
       "maxPriceMovementPercent": 0.03,
       "maxPriceMovementWindowMs": 1800000
     }
