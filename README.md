@@ -33,10 +33,10 @@ You may also specify additional optional variables:
 
 ```
 DISCORD_WEBHOOK_URI=Your Discord Incoming Webhook URI for trade notifications
-DISCORD_ALERT_WEBHOOK_URI=Your Discord Incoming Webhook URI for error notifications
+DISCORD_ALERT_WEBHOOK_URI=Your Discord Incoming Webhook URI for error notifications (defaults to the same as DISCORD_WEBHOOK_URI)
 EXECUTION_DELAY_MS=A number of milliseconds to delay before accepting or creating a swap (may be useful for testing) (default: 0)
 SLACK_WEBHOOK_URI=Your Slack Incoming Webhook URI for trade notifications (if you would rather use Slack than Discord)
-SLACK_ALERT_WEBHOOK_URI=Your Slack Incoming Webhook URI for error notifications (if you would rather use Slack than Discord)
+SLACK_ALERT_WEBHOOK_URI=Your Slack Incoming Webhook URI for error notifications (if you would rather use Slack than Discord) (defaults to the same as SLACK_WEBHOOK_URI)
 ```
 
 Next, if you're going to use the included strategies, you should configure them to your liking in the [./config](./config) directory. There are three files there:
