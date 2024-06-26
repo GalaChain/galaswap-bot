@@ -110,6 +110,7 @@ export async function getSwapsToAccept(
     giveLimitPerReset,
     amountGivenThisInterval,
     maxReceivingTokenPriceUSD,
+    minReceivingTokenAmount,
   } of pairLimitsWithCurrentState) {
     if (givingTokenPriceChangePercent > maxPriceMovementPercent) {
       continue;
@@ -167,6 +168,14 @@ export async function getSwapsToAccept(
       ).toString();
 
       const usesToAccept = calculateUsesToAccept(swap, canGiveUpTo);
+      const amountToReceive = BigNumber(usesToAccept).times(swap.wanted[0].quantity);
+
+      if (
+        typeof minReceivingTokenAmount === 'number' &&
+        amountToReceive.lt(minReceivingTokenAmount)
+      ) {
+        continue;
+      }
 
       if (usesToAccept === '0') {
         continue;

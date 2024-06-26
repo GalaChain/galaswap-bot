@@ -11,6 +11,7 @@ export const accepterPairConfigSchema = z.object({
   maxPriceMovementPercent: z.number().positive(),
   maxPriceMovementWindowMs: z.number().positive(),
   maxReceivingTokenPriceUSD: z.number().positive().optional(),
+  minReceivingTokenAmount: z.number().positive().optional(),
 });
 
 export type IAccepterPairConfig = z.infer<typeof accepterPairConfigSchema>;

@@ -168,4 +168,48 @@ describe('Basic swap accepter tests', () => {
 
     assert.equal(results2.length, 1);
   });
+
+  it('Respects minReceivingTokenAmount', async () => {
+    const pairLimits = [
+      makePairLimit({
+        givingTokenClass: makeTokenClass('GUSDC'),
+        receivingTokenClass: makeTokenClass('GALA'),
+        rate: 1,
+        minReceivingTokenAmount: 100,
+      }),
+    ] as const;
+
+    const swapWithEnoughToAccept = makeAvailableSwap({
+      wantedCollection: 'GUSDC',
+      wantedQuantity: '10',
+      offeredCollection: 'GALA',
+      offeredQuantity: '200',
+      uses: '10',
+    });
+
+    const swapWithoutEnoughToAccept = {
+      ...swapWithEnoughToAccept,
+      usesSpent: '6', // only has 80 GALA left to give, already gave 120 of the total 200
+    };
+
+    const results1 = await getSwapsToAccept(
+      ...argumentsToFunctionParameters({
+        ...baseArguments,
+        availableSwaps: [swapWithEnoughToAccept],
+        pairLimits,
+      }),
+    );
+
+    assert.equal(results1.length, 1);
+
+    const results2 = await getSwapsToAccept(
+      ...argumentsToFunctionParameters({
+        ...baseArguments,
+        availableSwaps: [swapWithoutEnoughToAccept],
+        pairLimits,
+      }),
+    );
+
+    assert.equal(results2.length, 0);
+  });
 });

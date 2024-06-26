@@ -48,6 +48,7 @@ Next, if you're going to use the included strategies, you should configure them 
    - `maxPriceMovementPercent`: The maximum difference between the min and max price of either of the tokens in the pair during the number of milliseconds specified in the below option (`maxPriceMovementWindowMs`). If prices move more than this much during the specified period of time, the bot will stop accepting swaps for this pair until prices become less volatile. For example a value of `0.03` allows up to 3% price movement.
    - `maxPriceMovementWindowMs`: The length of time in milliseconds that the bot will look back to calculate volatility as explained above.
    - `maxReceivingTokenPriceUSD` (optional): If the price of the receiving token goes above this number of USD, the bot will stop accepting swaps for this pair.
+   - `minReceivingTokenAmount` (optional): The minimum amount of the receiving token that the bot will accept in a swap. If the bot cannot get at least this amount of the receiving token by accepting a swap, it will not accept the swap.
 2. `basic_swap_creator.json`: This defines swaps that the bot should create. There are three subsections in this configuration:
    - `targetActiveSwaps`: This is a list of pairs that the bot will try to keep active swaps for. For each pair you can configure:
      - `targetProfitability`: The rate that the bot will offer, compared to the market rate. For example, `1.05` means the bot will offer swaps that are 5% better (for itself) than the current market rate.
