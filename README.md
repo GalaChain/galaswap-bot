@@ -84,6 +84,8 @@ sudo docker compose down
 
 You may need to omit `sudo` in both commands on Windows or depending on how you have Docker installed.
 
+Note that if you have the `basic_swap_creator.json` strategy enabled, the bot will cancel any swaps you have open that do not match the configuration in that file.
+
 ## Writing Your Own Strategies
 
 With knowledge of TypeScript, it should be fairly straightforward to write your own strategies. You can put them into the `src/strategies` directory, import them in `src/bot_main.ts`, and add them in the `strategiesToUse` array. On each tick, your strategy should return an array of swaps to accept, swaps to terminate, and swaps to create (any or all of those arrays may be empty).
