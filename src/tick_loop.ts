@@ -157,12 +157,16 @@ export async function mainLoopTick(
       }
 
       for (const swapToAccept of swapsToAccept) {
-        await reporter.reportAcceptingSwap(allTokenValues, swapToAccept);
-        await sleep(executionDelay);
-        const acceptResult = await galaSwapApi.acceptSwap(
-          swapToAccept.swapRequestId,
-          swapToAccept.usesToAccept,
-        );
+        const reportPromise = reporter.reportAcceptingSwap(allTokenValues, swapToAccept);
+        if (executionDelay) {
+          await reportPromise;
+          await sleep(executionDelay);
+        }
+
+        const [acceptResult] = await Promise.all([
+          galaSwapApi.acceptSwap(swapToAccept.swapRequestId, swapToAccept.usesToAccept),
+          reportPromise,
+        ]);
 
         await handleSwapAcceptResult(acceptedSwapStore, reporter, swapToAccept, acceptResult);
       }
