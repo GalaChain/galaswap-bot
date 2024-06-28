@@ -2,7 +2,7 @@ import assert from 'assert';
 import BigNumber from 'bignumber.js';
 import { IGalaSwapToken, IRawSwap, ITokenBalance } from '../../dependencies/galaswap/types.js';
 import { IStatusReporter } from '../../dependencies/status_reporters.js';
-import { areSameTokenClass } from '../../types/type_helpers.js';
+import { areSameTokenClass, stringifyTokenClass } from '../../types/type_helpers.js';
 import { ITokenClassKey } from '../../types/types.js';
 import { getUseableBalances } from '../../utils/galachain_utils.js';
 import {
@@ -131,7 +131,10 @@ export async function getSwapsToAccept(
     }
 
     const receivingTokenValue = tokenValues.find((t) => areSameTokenClass(t, receivingTokenClass));
-    assert(receivingTokenValue, `Token value not found for ${receivingTokenClass}`);
+    assert(
+      receivingTokenValue,
+      `Token value not found for ${stringifyTokenClass(receivingTokenClass)}`,
+    );
 
     if (
       typeof maxReceivingTokenPriceUSD === 'number' &&
