@@ -171,7 +171,7 @@ export async function getSwapsToAccept(
       ).toString();
 
       const usesToAccept = calculateUsesToAccept(swap, canGiveUpTo);
-      const amountToReceive = BigNumber(usesToAccept).times(swap.wanted[0].quantity);
+      const amountToReceive = BigNumber(usesToAccept).times(swap.offered[0].quantity);
 
       if (
         typeof minReceivingTokenAmount === 'number' &&

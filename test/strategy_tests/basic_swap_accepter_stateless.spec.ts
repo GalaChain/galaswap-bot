@@ -172,29 +172,30 @@ describe('Basic swap accepter tests', () => {
   it('Respects minReceivingTokenAmount', async () => {
     const pairLimits = [
       makePairLimit({
-        givingTokenClass: makeTokenClass('GUSDC'),
-        receivingTokenClass: makeTokenClass('GALA'),
+        givingTokenClass: makeTokenClass('GALA'),
+        receivingTokenClass: makeTokenClass('GUSDC'),
         rate: 1,
-        minReceivingTokenAmount: 100,
+        minReceivingTokenAmount: 50,
       }),
     ] as const;
 
     const swapWithEnoughToAccept = makeAvailableSwap({
-      wantedCollection: 'GUSDC',
-      wantedQuantity: '10',
-      offeredCollection: 'GALA',
-      offeredQuantity: '200',
+      wantedCollection: 'GALA',
+      wantedQuantity: '200',
+      offeredCollection: 'GUSDC',
+      offeredQuantity: '10',
       uses: '10',
     });
 
     const swapWithoutEnoughToAccept = {
       ...swapWithEnoughToAccept,
-      usesSpent: '6', // only has 80 GALA left to give, already gave 120 of the total 200
+      usesSpent: '6', // only has 4 GUSDC left to give, already gave 6 of the total 10
     };
 
     const results1 = await getSwapsToAccept(
       ...argumentsToFunctionParameters({
         ...baseArguments,
+        ownBalances: [makeBalance({ collection: 'GALA', quantity: '1000' })],
         availableSwaps: [swapWithEnoughToAccept],
         pairLimits,
       }),
@@ -205,6 +206,7 @@ describe('Basic swap accepter tests', () => {
     const results2 = await getSwapsToAccept(
       ...argumentsToFunctionParameters({
         ...baseArguments,
+        ownBalances: [makeBalance({ collection: 'GALA', quantity: '1000' })],
         availableSwaps: [swapWithoutEnoughToAccept],
         pairLimits,
       }),
