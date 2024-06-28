@@ -4,7 +4,7 @@ import locko from 'locko';
 import pRetry from 'p-retry';
 import util from 'util';
 import { ISwapToAccept, ISwapToTerminate } from '../strategies/swap_strategy.js';
-import { areSameTokenClass } from '../types/type_helpers.js';
+import { areSameTokenClass, stringifyTokenClass } from '../types/type_helpers.js';
 import {
   getActualSwapRate,
   getCurrentMarketRate,
@@ -45,8 +45,14 @@ function getSwapDetails(
     areSameTokenClass(t, swap.offered[0].tokenInstance),
   );
 
-  assert(wantedTokenValue, 'Wanted token value not found');
-  assert(offeredTokenValue, 'Offered token value not found');
+  assert(
+    wantedTokenValue,
+    `Wanted token (${stringifyTokenClass(swap.wanted[0].tokenInstance)}) value not found`,
+  );
+  assert(
+    offeredTokenValue,
+    `Offered token (${stringifyTokenClass(swap.offered[0].tokenInstance)}) value not found`,
+  );
 
   const wantedQuantum = getQuantum(swap.wanted);
   const offeringQuantum = getQuantum(swap.offered);
