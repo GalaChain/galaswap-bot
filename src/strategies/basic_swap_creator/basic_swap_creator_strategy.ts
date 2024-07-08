@@ -30,7 +30,7 @@ export class BasicSwapCreatorStrategy implements ISwapStrategy {
 
   async doTick(
     logger: ILogger,
-    _reporter: IStatusReporter,
+    reporter: IStatusReporter,
     _selfUserId: string,
     _galaSwapApi: IGalaSwapApi,
     createdSwapStore: MongoCreatedSwapStore,
@@ -58,6 +58,7 @@ export class BasicSwapCreatorStrategy implements ISwapStrategy {
     );
 
     const swapsToCreate = await getSwapsToCreate(
+      reporter,
       logger,
       ownBalances,
       ownSwaps,

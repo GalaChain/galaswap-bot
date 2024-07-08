@@ -35,7 +35,7 @@ function calculateUsesToAccept(swap: IRawSwap, maxGive: string) {
 }
 
 export async function getSwapsToAccept(
-  _reporter: IStatusReporter,
+  reporter: IStatusReporter,
   ownWalletAddress: string,
   pairLimits: readonly Readonly<IAccepterPairConfig>[],
   ownBalances: readonly Readonly<ITokenBalance>[],
@@ -56,6 +56,16 @@ export async function getSwapsToAccept(
   } = {},
 ): Promise<readonly Readonly<ISwapToAccept>[]> {
   const useableBalances = getUseableBalances(ownBalances);
+  const useableGala = useableBalances.find((b) => b.collection === 'GALA')?.quantity ?? '0';
+
+  if (BigNumber(useableGala).lt(1)) {
+    await reporter.sendAlert(
+      'I have no $GALA! I need at least 1 $GALA in order to pay the fee when accepting a swap.',
+    );
+
+    return [];
+  }
+
   const now = options.now ?? new Date();
   const nowMs = now.getTime();
 
