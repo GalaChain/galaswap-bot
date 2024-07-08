@@ -1,6 +1,7 @@
 import assert from 'assert';
 import BigNumber from 'bignumber.js';
 import { IGalaSwapToken, IRawSwap, ITokenBalance } from '../../dependencies/galaswap/types.js';
+import { IStatusReporter } from '../../dependencies/status_reporters.js';
 import { areSameTokenClass, stringifyTokenClass } from '../../types/type_helpers.js';
 import { ILogger, ITokenClassKey } from '../../types/types.js';
 import { galaChainObjectIsExpired, getUseableBalances } from '../../utils/galachain_utils.js';
@@ -9,6 +10,7 @@ import { calculateSwapQuantitiesAndUses } from '../../utils/swap_uses.js';
 import { ISwapCreatorConfig } from './types.js';
 
 export async function getSwapsToCreate(
+  reporter: IStatusReporter,
   logger: ILogger,
   ownBalances: readonly Readonly<ITokenBalance>[],
   allSwaps: readonly Readonly<IRawSwap>[],
@@ -28,8 +30,23 @@ export async function getSwapsToCreate(
     now?: Date;
   },
 ) {
-  const useableBalances = getUseableBalances(ownBalances);
   const nowMs = options?.now?.getTime() ?? Date.now();
+
+  const useableBalancesPreFee = getUseableBalances(ownBalances);
+  const useableGala = useableBalancesPreFee.find((b) => b.collection === 'GALA')?.quantity ?? '0';
+
+  if (BigNumber(useableGala).lt(1)) {
+    await reporter.sendAlert(
+      'I have no $GALA! I need at least 1 $GALA in order to pay the fee when accepting a swap.',
+    );
+
+    return [];
+  }
+
+  const useableBalances = useableBalancesPreFee.map((b) => ({
+    ...b,
+    quantity: b.collection === 'GALA' ? BigNumber(b.quantity).minus(1).toString() : b.quantity,
+  }));
 
   for (const target of config.targetActiveSwaps) {
     const givingBalanceForThisTarget =

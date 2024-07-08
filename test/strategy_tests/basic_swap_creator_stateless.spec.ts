@@ -4,7 +4,7 @@ import { IRawSwap } from '../../src/dependencies/galaswap/types.js';
 import { getSwapsToCreate } from '../../src/strategies/basic_swap_creator/get_swap_to_create.js';
 import { mainLoopTick } from '../../src/tick_loop.js';
 import { MockGalaSwapApi } from '../mocks/mock_gala_swap_api.js';
-import { mockLogger, noopProxy } from '../mocks/noop_proxy.js';
+import { mockLogger, mockReporter, noopProxy } from '../mocks/noop_proxy.js';
 import {
   makeBalance,
   makeTargetActiveSwap,
@@ -35,7 +35,10 @@ describe('Basic swap creator tests', () => {
       }),
     ];
 
-    const ownBalances = [makeBalance({ collection: 'GUSDC', quantity: '1000' })];
+    const ownBalances = [
+      makeBalance({ collection: 'GUSDC', quantity: '1000' }),
+      makeBalance({ collection: 'GALA', quantity: '1' }),
+    ];
 
     const tokenValues = [
       makeTokenValue({ collection: 'GALA', usd: 0.05 }),
@@ -43,6 +46,7 @@ describe('Basic swap creator tests', () => {
     ];
 
     const swapsToCreate1 = await getSwapsToCreate(
+      mockReporter,
       mockLogger,
       ownBalances,
       createdSwaps,
@@ -84,8 +88,12 @@ describe('Basic swap creator tests', () => {
     ];
 
     const swapToCreate1 = await getSwapsToCreate(
+      mockReporter,
       mockLogger,
-      [makeBalance({ collection: 'GUSDC', quantity: '149' })],
+      [
+        makeBalance({ collection: 'GUSDC', quantity: '149' }),
+        makeBalance({ collection: 'GALA', quantity: '1' }),
+      ],
       createdSwaps,
       tokenValues,
       {
@@ -99,8 +107,12 @@ describe('Basic swap creator tests', () => {
     assert.equal(swapToCreate1.length, 0);
 
     const swapToCreate2 = await getSwapsToCreate(
+      mockReporter,
       mockLogger,
-      [makeBalance({ collection: 'GUSDC', quantity: '150' })],
+      [
+        makeBalance({ collection: 'GUSDC', quantity: '150' }),
+        makeBalance({ collection: 'GALA', quantity: '1' }),
+      ],
       createdSwaps,
       tokenValues,
       defaultTestSwapCreatorConfig,
@@ -130,6 +142,7 @@ describe('Basic swap creator tests', () => {
     ];
 
     const swapToCreate1 = await getSwapsToCreate(
+      mockReporter,
       mockLogger,
       [
         makeBalance({
@@ -140,6 +153,7 @@ describe('Basic swap creator tests', () => {
             { quantity: '1', expires: 0 },
           ],
         }),
+        makeBalance({ collection: 'GALA', quantity: '1' }),
       ],
       createdSwaps,
       tokenValues,
@@ -154,6 +168,7 @@ describe('Basic swap creator tests', () => {
     assert.equal(swapToCreate1.length, 0);
 
     const swapToCreate2 = await getSwapsToCreate(
+      mockReporter,
       mockLogger,
       [
         makeBalance({
@@ -161,6 +176,7 @@ describe('Basic swap creator tests', () => {
           quantity: '152',
           lockedHolds: [{ quantity: '2', expires: 0 }],
         }),
+        makeBalance({ collection: 'GALA', quantity: '1' }),
       ],
       createdSwaps,
       tokenValues,
@@ -185,7 +201,10 @@ describe('Basic swap creator tests', () => {
       }),
     ];
 
-    const ownBalances = [makeBalance({ collection: 'GUSDC', quantity: '1000' })];
+    const ownBalances = [
+      makeBalance({ collection: 'GUSDC', quantity: '1000' }),
+      makeBalance({ collection: 'GALA', quantity: '1' }),
+    ];
 
     const tokenValues = [
       makeTokenValue({ collection: 'GALA', usd: 0.05 }),
@@ -193,6 +212,7 @@ describe('Basic swap creator tests', () => {
     ];
 
     const swapTosCreate1 = await getSwapsToCreate(
+      mockReporter,
       mockLogger,
       ownBalances,
       createdSwaps,
@@ -258,7 +278,10 @@ describe('Basic swap creator tests', () => {
       }),
     ];
 
-    const ownBalances = [makeBalance({ collection: 'GUSDC', quantity: '1000' })];
+    const ownBalances = [
+      makeBalance({ collection: 'GUSDC', quantity: '1000' }),
+      makeBalance({ collection: 'GALA', quantity: '1' }),
+    ];
 
     const tokenValues = [
       makeTokenValue({ collection: 'GALA', usd: 0.05 }),
@@ -266,6 +289,7 @@ describe('Basic swap creator tests', () => {
     ];
 
     const swapTosCreate1 = await getSwapsToCreate(
+      mockReporter,
       mockLogger,
       ownBalances,
       createdSwaps,
@@ -281,6 +305,7 @@ describe('Basic swap creator tests', () => {
     assert.equal(swapTosCreate1.length, 1);
 
     const swapTosCreate2 = await getSwapsToCreate(
+      mockReporter,
       mockLogger,
       ownBalances,
       createdSwaps,
