@@ -24,7 +24,10 @@ describe('Basic swap creator tick tests', async () => {
       }),
     ];
 
-    const balances = [makeBalance({ collection: 'GUSDC', quantity: '1000' })];
+    const balances = [
+      makeBalance({ collection: 'GUSDC', quantity: '1000' }),
+      makeBalance({ collection: 'GALA', quantity: '1' }),
+    ];
 
     await tickTestRunner(
       new BasicSwapCreatorStrategy({
@@ -95,7 +98,10 @@ describe('Basic swap creator tick tests', async () => {
       },
     ];
 
-    const balances = [makeBalance({ collection: 'GUSDC', quantity: '1000' })];
+    const balances = [
+      makeBalance({ collection: 'GUSDC', quantity: '1000' }),
+      makeBalance({ collection: 'GALA', quantity: '1' }),
+    ];
 
     await tickTestRunner(
       new BasicSwapCreatorStrategy({

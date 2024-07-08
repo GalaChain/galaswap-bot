@@ -31,8 +31,9 @@ export async function getSwapsToCreate(
   },
 ) {
   const nowMs = options?.now?.getTime() ?? Date.now();
-  const useableBalances = getUseableBalances(ownBalances);
-  const useableGala = useableBalances.find((b) => b.collection === 'GALA')?.quantity ?? '0';
+
+  const useableBalancesPreFee = getUseableBalances(ownBalances);
+  const useableGala = useableBalancesPreFee.find((b) => b.collection === 'GALA')?.quantity ?? '0';
 
   if (BigNumber(useableGala).lt(1)) {
     await reporter.sendAlert(
@@ -41,6 +42,11 @@ export async function getSwapsToCreate(
 
     return [];
   }
+
+  const useableBalances = useableBalancesPreFee.map((b) => ({
+    ...b,
+    quantity: b.collection === 'GALA' ? BigNumber(b.quantity).minus(1).toString() : b.quantity,
+  }));
 
   for (const target of config.targetActiveSwaps) {
     const givingBalanceForThisTarget =

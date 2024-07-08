@@ -55,8 +55,11 @@ export async function getSwapsToAccept(
     now?: Date | undefined;
   } = {},
 ): Promise<readonly Readonly<ISwapToAccept>[]> {
-  const useableBalances = getUseableBalances(ownBalances);
-  const useableGala = useableBalances.find((b) => b.collection === 'GALA')?.quantity ?? '0';
+  const now = options.now ?? new Date();
+  const nowMs = now.getTime();
+
+  const useableBalancesPreFee = getUseableBalances(ownBalances);
+  const useableGala = useableBalancesPreFee.find((b) => b.collection === 'GALA')?.quantity ?? '0';
 
   if (BigNumber(useableGala).lt(1)) {
     await reporter.sendAlert(
@@ -66,8 +69,10 @@ export async function getSwapsToAccept(
     return [];
   }
 
-  const now = options.now ?? new Date();
-  const nowMs = now.getTime();
+  const useableBalances = useableBalancesPreFee.map((b) => ({
+    ...b,
+    quantity: b.collection === 'GALA' ? BigNumber(b.quantity).minus(1).toString() : b.quantity,
+  }));
 
   const pairLimitsWithCurrentState = await Promise.all(
     pairLimits.map(async (l) => {

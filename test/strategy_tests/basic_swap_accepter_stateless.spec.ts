@@ -11,8 +11,8 @@ const baseArguments = {
   availableSwaps: [makeAvailableSwap()] as ReadonlyArray<ReturnType<typeof makeAvailableSwap>>, // Giving 100 GUSDC, receiving 2000 GALA
   ownBalances: [
     makeBalance({ quantity: '1000' }),
-    makeBalance({ collection: 'GALA' }),
-  ] as ReadonlyArray<ReturnType<typeof makeBalance>>, // 1000 GUSDC, 0 GALA
+    makeBalance({ collection: 'GALA', quantity: '1' }),
+  ] as ReadonlyArray<ReturnType<typeof makeBalance>>, // 1000 GUSDC, 1 GALA
   galaSwapTokens: testTokens, // GUSDC $1, GALA $0.05
   ownUserId: 'client|me',
   quantityGivenSince: 0,
@@ -195,7 +195,7 @@ describe('Basic swap accepter tests', () => {
     const results1 = await getSwapsToAccept(
       ...argumentsToFunctionParameters({
         ...baseArguments,
-        ownBalances: [makeBalance({ collection: 'GALA', quantity: '1000' })],
+        ownBalances: [makeBalance({ collection: 'GALA', quantity: '1001' })],
         availableSwaps: [swapWithEnoughToAccept],
         pairLimits,
       }),
@@ -206,12 +206,39 @@ describe('Basic swap accepter tests', () => {
     const results2 = await getSwapsToAccept(
       ...argumentsToFunctionParameters({
         ...baseArguments,
-        ownBalances: [makeBalance({ collection: 'GALA', quantity: '1000' })],
+        ownBalances: [makeBalance({ collection: 'GALA', quantity: '1001' })],
         availableSwaps: [swapWithoutEnoughToAccept],
         pairLimits,
       }),
     );
 
     assert.equal(results2.length, 0);
+  });
+
+  it('Should take the fee into account when deciding how much of a swap it can accept', async () => {
+    const result = await getSwapsToAccept(
+      ...argumentsToFunctionParameters({
+        ...baseArguments,
+        ownBalances: [makeBalance({ collection: 'GALA', quantity: '200' })],
+        pairLimits: [
+          makePairLimit({
+            givingTokenClass: makeTokenClass('GALA'),
+            receivingTokenClass: makeTokenClass('GUSDC'),
+          }),
+        ],
+        availableSwaps: [
+          makeAvailableSwap({
+            wantedCollection: 'GALA',
+            wantedQuantity: '20',
+            offeredCollection: 'GUSDC',
+            offeredQuantity: '1',
+            uses: '10',
+          }),
+        ],
+      }),
+    );
+
+    assert.equal(result.length, 1);
+    assert.equal(result[0]!.usesToAccept, '9');
   });
 });
