@@ -10,7 +10,7 @@
       "name": "Debug Bot",
       "runtimeExecutable": "npm",
       "runtimeArgs": ["start"],
-      "console": "integratedTerminal",
+      "console": "internalConsole",
       "internalConsoleOptions": "neverOpen",
       "runtimeVersion": "20"
     },
@@ -20,7 +20,7 @@
       "name": "Debug Tests",
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "test:debug"],
-      "console": "integratedTerminal",
+      "console": "internalConsole",
       "internalConsoleOptions": "neverOpen",
       "runtimeVersion": "20"
     },
@@ -30,7 +30,7 @@
       "name": "Debug Tests (Current File)",
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "test:debug:nospec", "--", "--spec", "${relativeFile}"],
-      "console": "integratedTerminal",
+      "console": "internalConsole",
       "internalConsoleOptions": "neverOpen",
       "runtimeVersion": "20"
     }

@@ -1,6 +1,9 @@
 import crypto from 'crypto';
 import { IGalaSwapToken, IRawSwap, ITokenBalance } from '../src/dependencies/galaswap/types.js';
-import { IAccepterPairConfig } from '../src/strategies/basic_swap_accepter/types.js';
+import {
+  IAccepterPairConfig,
+  IMinimumBalanceConfig,
+} from '../src/strategies/basic_swap_accepter/types.js';
 import { ITargetActiveSwaps } from '../src/strategies/basic_swap_creator/types.js';
 
 export function makeTokenClass(collection: string) {
@@ -104,5 +107,14 @@ export function makeTargetActiveSwap(options: Partial<ITargetActiveSwaps>): ITar
     maxPriceMovementPercent: 100,
     maxPriceMovementWindowMs: 1,
     ...options,
+  };
+}
+
+export function makeMinimumBalance(
+  options: { collection?: string | undefined; balance?: number } = {},
+): IMinimumBalanceConfig {
+  return {
+    ...makeTokenClass(options.collection ?? 'GUSDC'),
+    minimumBalance: options.balance ?? 0,
   };
 }

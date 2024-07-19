@@ -11,7 +11,7 @@ import {
   getSwapGoodnessRate,
 } from '../../utils/get_current_market_rate.js';
 import { ISwapToAccept } from '../swap_strategy.js';
-import { IAccepterPairConfig } from './types.js';
+import { IAccepterPairConfig, IMinimumBalanceConfig } from './types.js';
 
 type GetPriceChangePercentDelegate = (
   tokenClass: ITokenClassKey,
@@ -40,6 +40,7 @@ export async function getSwapsToAccept(
   pairLimits: readonly Readonly<IAccepterPairConfig>[],
   ownBalances: readonly Readonly<ITokenBalance>[],
   tokenValues: readonly Readonly<IGalaSwapToken>[],
+  minumumBalances: readonly Readonly<IMinimumBalanceConfig>[],
   getAvailableSwapsForPair: (
     givingTokenClass: Readonly<ITokenClassKey>,
     receivingTokenClass: Readonly<ITokenClassKey>,
@@ -69,10 +70,19 @@ export async function getSwapsToAccept(
     return [];
   }
 
-  const useableBalances = useableBalancesPreFee.map((b) => ({
-    ...b,
-    quantity: b.collection === 'GALA' ? BigNumber(b.quantity).minus(1).toString() : b.quantity,
-  }));
+  const useableBalances = useableBalancesPreFee.map((b) => {
+    const matchingMinimumBalance =
+      minumumBalances.find((m) => areSameTokenClass(m, b))?.minimumBalance ?? 0;
+
+    // Add one to the minimum GALA balance so we have enough to pay the 1 GALA fee
+    const adjustedMinimumBalance =
+      b.collection == 'GALA' ? matchingMinimumBalance + 1 : matchingMinimumBalance;
+
+    return {
+      ...b,
+      quantity: BigNumber(b.quantity).minus(adjustedMinimumBalance),
+    };
+  });
 
   const pairLimitsWithCurrentState = await Promise.all(
     pairLimits.map(async (l) => {
