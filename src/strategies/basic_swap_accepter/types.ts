@@ -16,6 +16,16 @@ export const accepterPairConfigSchema = z.object({
 
 export type IAccepterPairConfig = z.infer<typeof accepterPairConfigSchema>;
 
+export const minimumBalanceConfigSchema = z.object({
+  collection: z.string(),
+  category: z.string(),
+  type: z.string(),
+  additionalKey: z.string(),
+  minimumBalance: z.number().nonnegative(),
+});
+
+export type IMinimumBalanceConfig = z.infer<typeof minimumBalanceConfigSchema>;
+
 export const basicSwapAccepterConfigSchema = z.object({
   active: z.boolean(),
   tradeLimits: z.array(accepterPairConfigSchema).refine(
@@ -34,4 +44,5 @@ export const basicSwapAccepterConfigSchema = z.object({
     },
     { message: 'Trade limits must be unique per pair' },
   ),
+  minimumBalances: z.array(minimumBalanceConfigSchema),
 });

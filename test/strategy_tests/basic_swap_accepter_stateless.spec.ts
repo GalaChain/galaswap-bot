@@ -4,7 +4,13 @@ import { areSameTokenClass } from '../../src/types/type_helpers.js';
 import { ITokenClassKey } from '../../src/types/types.js';
 import { testTokens } from '../data/test_tokens.js';
 import { noopProxy } from '../mocks/noop_proxy.js';
-import { makeAvailableSwap, makeBalance, makePairLimit, makeTokenClass } from '../test_helpers.js';
+import {
+  makeAvailableSwap,
+  makeBalance,
+  makeMinimumBalance,
+  makePairLimit,
+  makeTokenClass,
+} from '../test_helpers.js';
 
 const baseArguments = {
   pairLimits: [makePairLimit()] as ReadonlyArray<ReturnType<typeof makePairLimit>>, // GUSDC/GALA rate of 1, 1000 per hour
@@ -16,6 +22,7 @@ const baseArguments = {
   galaSwapTokens: testTokens, // GUSDC $1, GALA $0.05
   ownUserId: 'client|me',
   quantityGivenSince: 0,
+  mininumBalances: [makeMinimumBalance({ collection: 'GALA', balance: 0 })],
   getPriceChangePercent: async (_tokenClass: ITokenClassKey, _since: Date, _until: Date) => 0,
 };
 
@@ -28,6 +35,7 @@ function argumentsToFunctionParameters(
     args.pairLimits,
     args.ownBalances,
     args.galaSwapTokens,
+    args.mininumBalances,
     async (
       givingTokenClass: Readonly<ITokenClassKey>,
       receivingTokenClass: Readonly<ITokenClassKey>,
@@ -240,5 +248,33 @@ describe('Basic swap accepter tests', () => {
 
     assert.equal(result.length, 1);
     assert.equal(result[0]!.usesToAccept, '9');
+  });
+
+  it('Respects minimum balance', async () => {
+    const result = await getSwapsToAccept(
+      ...argumentsToFunctionParameters({
+        ...baseArguments,
+        ownBalances: [makeBalance({ collection: 'GALA', quantity: '1000' })],
+        mininumBalances: [makeMinimumBalance({ collection: 'GALA', balance: 500 })],
+        pairLimits: [
+          makePairLimit({
+            givingTokenClass: makeTokenClass('GALA'),
+            receivingTokenClass: makeTokenClass('GUSDC'),
+          }),
+        ],
+        availableSwaps: [
+          makeAvailableSwap({
+            wantedCollection: 'GALA',
+            wantedQuantity: '1',
+            offeredCollection: 'GUSDC',
+            offeredQuantity: '0.05',
+            uses: '1000',
+          }),
+        ],
+      }),
+    );
+
+    assert.equal(result.length, 1);
+    assert.equal(result[0]!.usesToAccept, '499');
   });
 });

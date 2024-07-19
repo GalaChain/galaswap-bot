@@ -56,6 +56,7 @@ export class BasicSwapAccepterStrategy implements ISwapStrategy {
       this.config.tradeLimits,
       ownBalances,
       tokenValues,
+      this.config.minimumBalances,
       (givingTokenClass, receivingTokenClass) => {
         return galaSwapApi.getAvailableSwaps(givingTokenClass, receivingTokenClass);
       },
