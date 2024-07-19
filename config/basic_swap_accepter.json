@@ -46,7 +46,7 @@
       "category": "Unit",
       "type": "none",
       "additionalKey": "none",
-      "balance": 100
+      "minimumBalance": 100
     }
   ]
 }
