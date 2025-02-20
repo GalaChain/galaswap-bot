@@ -45,10 +45,23 @@ export function getSwapsToTerminate(
       continue;
     }
 
+    const minimumTokenValues =
+      typeof target.givingTokenClassMinimumValue === 'number'
+        ? [
+            {
+              ...target.givingTokenClass,
+              currentPrices: {
+                usd: target.givingTokenClassMinimumValue,
+              },
+            },
+          ]
+        : [];
+
     const currentMarketRate = getCurrentMarketRate(
       swapOffered.tokenInstance,
       swapWanted.tokenInstance,
       tokenValues,
+      minimumTokenValues,
     );
 
     assert(currentMarketRate !== undefined, 'No current market rate found');

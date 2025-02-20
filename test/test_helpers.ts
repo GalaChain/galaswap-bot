@@ -118,3 +118,16 @@ export function makeMinimumBalance(
     minimumBalance: options.balance ?? 0,
   };
 }
+
+export function createTestSwap(
+  swapToCreate: Pick<IRawSwap, 'offered' | 'wanted' | 'uses'>,
+): IRawSwap {
+  return {
+    ...swapToCreate,
+    swapRequestId: crypto.randomUUID(),
+    created: Date.now(),
+    expires: 0,
+    usesSpent: '0',
+    offeredBy: 'client',
+  };
+}
