@@ -148,11 +148,23 @@ export async function getSwapsToCreate(
     }
 
     const amountToGive = BigNumber(target.targetGivingSize);
+    const minimumTokenValues =
+      typeof target.givingTokenClassMinimumValue === 'number'
+        ? [
+            {
+              ...target.givingTokenClass,
+              currentPrices: {
+                usd: target.givingTokenClassMinimumValue,
+              },
+            },
+          ]
+        : [];
 
     const currentMarketRate = getCurrentMarketRate(
       target.givingTokenClass,
       target.receivingTokenClass,
       tokenValues,
+      minimumTokenValues,
     );
 
     assert(currentMarketRate !== undefined, 'No current market rate found');

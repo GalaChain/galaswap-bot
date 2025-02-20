@@ -64,6 +64,7 @@ Next, if you're going to use the included strategies, you should configure them 
      - `maxPriceMovementPercent`: The maximum difference between the min and max price of either of the tokens in the pair during the number of milliseconds specified in the below option (`maxPriceMovementWindowMs`). If prices move more than this much during the specified period of time, the bot will stop creating swaps for this pair until prices become less volatile. For example a value of `0.03` allows up to 3% price movement.
      - `maxPriceMovementWindowMs`: The length of time in milliseconds that the bot will look back to calculate volatility as explained above.
      - `maxReceivingTokenPriceUSD` (optional): If the price of the receiving token goes above this number of USD, the bot will stop creating swaps for this pair.
+     - `givingTokenClassMinimumValue` (optional): If the giving token class's actual value (according to GalaSwap) goes below this number of USD, the bot will use the `givingTokenClassMinimumAmount` instead of the actual value. This allows you to set a lower limit on the rate that the bot will ask for.
    - `receivingTokenRoundingConfigs`: When the bot calculates how many tokens it wants to receive in a swap, it will round the number of tokens up to the number of `decimalPlaces` that you configure here.
    - `creationLimits`: The bot will stop creating new swaps when it gives a specified amount of the `givingTokenClass` within a specified time period. That's configurable here.
 3. `token_config.json`: This config file contains two sections:

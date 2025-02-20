@@ -22,6 +22,7 @@ const targetActiveSwapsSchema = z
     maxPriceMovementPercent: z.number().positive(),
     maxPriceMovementWindowMs: z.number().positive(),
     maxReceivingTokenPriceUSD: z.number().positive().optional(),
+    givingTokenClassMinimumValue: z.number().positive().optional(),
   })
   .refine((data) => data.minProfitability < data.maxProfitability, {
     message: 'minProfitability must be less than maxProfitability',

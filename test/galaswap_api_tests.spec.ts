@@ -1,12 +1,13 @@
 import assert from 'assert';
+import { Wallet } from 'ethers';
 import { GalaSwapApi, GalaSwapErrorResponse } from '../src/dependencies/galaswap/galaswap_api.js';
 import { mockLogger } from './mocks/noop_proxy.js';
 
 describe('GalaSwap API tests', () => {
   const unauthenticatedApi = new GalaSwapApi(
     'https://api-galaswap.gala.com',
-    'client|abcde',
-    '0x0000000000000000000000000000000000000000000000000000000000000001',
+    'client|abceabcdabcdabfdabceabcd',
+    Wallet.createRandom().privateKey,
     fetch,
     mockLogger,
     { maxRetries: 0 },
@@ -51,7 +52,7 @@ describe('GalaSwap API tests', () => {
         'Expected error to be instance of GalaSwapErrorResponse',
       );
 
-      assert.equal(err.errorCode, 'PK_NOT_FOUND');
+      assert.equal(err.errorCode, 'PUBLIC_KEY_MISMATCH');
     }
   }).timeout(10_000);
 });

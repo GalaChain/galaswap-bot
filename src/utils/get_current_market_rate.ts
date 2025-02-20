@@ -15,18 +15,41 @@ export type SwapGoodnessRate = Brand<number, 'SwapGoodnessRate'>;
 export function getCurrentMarketRate(
   givingTokenClass: ITokenClassKey,
   receivingTokenClass: ITokenClassKey,
-  tokenValues: readonly IGalaSwapToken[],
+  actualTokenValues: readonly IGalaSwapToken[],
+  minTokenValues?: readonly Omit<IGalaSwapToken, 'symbol' | 'decimals'>[],
 ) {
-  const givingTokenValue = tokenValues.find((token) => areSameTokenClass(token, givingTokenClass));
-  const receivingTokenValue = tokenValues.find((token) =>
+  const givingTokenActualValue = actualTokenValues.find((token) =>
+    areSameTokenClass(token, givingTokenClass),
+  );
+  const receivingTokenActualValue = actualTokenValues.find((token) =>
     areSameTokenClass(token, receivingTokenClass),
   );
 
-  if (!givingTokenValue?.currentPrices?.usd || !receivingTokenValue?.currentPrices?.usd) {
+  if (
+    !givingTokenActualValue?.currentPrices?.usd ||
+    !receivingTokenActualValue?.currentPrices?.usd
+  ) {
     return undefined;
   }
 
-  const rate = givingTokenValue.currentPrices.usd / receivingTokenValue.currentPrices.usd;
+  const givingTokenMinValue = minTokenValues?.find((token) =>
+    areSameTokenClass(token, givingTokenClass),
+  );
+  const receivingTokenMinValue = minTokenValues?.find((token) =>
+    areSameTokenClass(token, receivingTokenClass),
+  );
+
+  const givingTokenAdjustedValue = Math.max(
+    givingTokenActualValue.currentPrices.usd,
+    givingTokenMinValue?.currentPrices?.usd ?? 0,
+  );
+
+  const receivingTokenAdjustedValue = Math.max(
+    receivingTokenActualValue.currentPrices.usd,
+    receivingTokenMinValue?.currentPrices?.usd ?? 0,
+  );
+
+  const rate = givingTokenAdjustedValue / receivingTokenAdjustedValue;
   assert(!Number.isNaN(rate) && rate > 0, 'Invalid market rate');
 
   return rate as CurrentMarketRate;
